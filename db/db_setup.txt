@@ -1,0 +1,17 @@
+Install MySQL:
+
+	#apt-get install mysql-server mysql-client
+	set password during the installation (1234 for example)
+
+Create database:
+
+	run client and input password: #mysql -u root -p
+
+	create database (logbook) and tables (vehicles, service, fuel), insert rows:
+	mysql>
+		create database logbook;
+		use logbook;
+		create table vehicles (id INTEGER AUTO_INCREMENT, name VARCHAR(64), plate VARCHAR(16), active BOOL, description TEXT, PRIMARY KEY (id));
+		insert into vehicles (name,plate,active,description) values ('Renault','XxX-XxXx',1,'auto')('Chevrolet','xXx-xXxX',1,'taky auto');
+		
+		

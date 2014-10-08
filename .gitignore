@@ -1,3 +1,4 @@
 bills/*.jpg
 data
 index.html
+__pycache__

@@ -5,6 +5,8 @@ import datetime
 
 import subprocess
 
+import utils
+
 sourcefile = 'template.html'
 filename = 'index.html'
 billsdir = 'bills'
@@ -29,22 +31,12 @@ if __name__ == '__main__':
 
     #scan directory containing bills
     print('Scanning bill directory ... ',end='')
-    try:
-        dirlist = listdir(billsdir)
-        dirlist.sort(reverse=True)
-        bills = []
-        errors = []
-        for fname in dirlist:
-            try:
-                sname = fname.split('.')[0].split('_')
-                date = datetime.datetime.strptime(sname[0],'%Y%m%d').date()
-                car = sname[1]
-                vol = sname[2].split('l')
-                vol = float('{}.{}'.format(vol[0],vol[1]))
-                kmage = int(sname[3][:-2])
-                bills.append([date,car,vol,kmage,fname])
-            except:
-                errors.append(fname)
+    fscan = utils.scan_bills_directory(billsdir)
+    if fscan==None:
+        print('Error')
+    else:
+        bills = fscan[0]
+        errors = fscan[1]
         if len(errors)==0:
             print('{} items'.format(len(bills)))
         else:
@@ -53,25 +45,18 @@ if __name__ == '__main__':
             for fname in errors:
                 print('   ERROR {} .. {}'.format(cnt,fname))
                 cnt += 1
-    except:
-        print('Error')
 
     #sort data by car name
     print('Sorting bills ... ',end='')
-    try:
-        auta = []
-        spotreba = {}
-        for bill in bills:
-            if bill[1] not in spotreba:
-                auta.append(bill[1])
-                spotreba[bill[1]] = [[bill[0],bill[2],bill[3]],]
-            else:
-                spotreba[bill[1]].append([bill[0],bill[2],bill[3]])
+    sortdata = utils.sort_data_by_vehicle(bills)
+    if sortdata==None:
+        print('Error')
+    else:
+        auta = sortdata[0]
+        spotreba = sortdata[1]
         print('{} vehicles found'.format(len(auta)))
         for auto in auta:
             print('   {} .. {} bills'.format(auto,len(spotreba[auto])))
-    except:
-        print('Error')
 
     # test if workdir exist and create it if not
     if (path.isdir(workdir)):

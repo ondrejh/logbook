@@ -1,18 +1,18 @@
 #! /var/bin/python3
 
-from os import listdir
+from os import listdir,path,makedirs
 import datetime
 
 import subprocess
 
 sourcefile = 'template.html'
-filename = 'uctenky.html'
-billsdir = 'uctenky'
+filename = 'index.html'
+billsdir = 'bills'
 
 #fault fuelconsumption treshold
 fault_consp_thld = 2/3
 
-workdir='data/'
+workdir='data'
 
 if __name__ == '__main__':
 
@@ -48,6 +48,12 @@ if __name__ == '__main__':
         else:
             spotreba[bill[1]].append([bill[0],bill[2],bill[3]])
 
+    # test if workdir exist and create it if not
+    if (path.isdir(workdir)):
+        pass
+    else:
+        makedirs(workdir)
+
     #calculate fuel comp. for cars
     for auto in auta:
         #print(auto)
@@ -78,7 +84,7 @@ if __name__ == '__main__':
         #print(ravg)
 
         #save data form plotting
-        fname = '{}{}_data.txt'.format(workdir,auto)
+        fname = '{}/{}_data.txt'.format(workdir,auto)
         f = open(fname,'w')
         f.write('# date; fuel consumption[l/100km]\n')
         for raw in spotreba[auto]:
@@ -89,7 +95,7 @@ if __name__ == '__main__':
         f.close()
 
     # create gnuplot script
-    fname = '{}plotit.gp'.format(workdir)
+    fname = '{}/plotit.gp'.format(workdir)
     f = open(fname,'w')
     f.write('#! /usr/bin/gnuplot\n\n')
     f.write('# this script plots fuel consumption from files\n# is\'s probably automatically generated just before plotting so it doesn\'t make\n# a big sence to modify it\n# running the script: gnuplot plotit.gp\n\n')
@@ -102,7 +108,7 @@ if __name__ == '__main__':
     f.write('set ylabel "l/100km"\n')
     f.write('set autoscale y\n')
     f.write('set autoscale x\n')
-    f.write('set output \'{}chart.png\'\n'.format(workdir))
+    f.write('set output \'{}/chart.png\'\n'.format(workdir))
     f.write('set datafile separator \';\'\n')
     f.write('set grid\n')
     f.write('plot ')
@@ -112,13 +118,13 @@ if __name__ == '__main__':
             afirst=False
         else:
             f.write(', \\\n     ')
-        f.write('\'{}{}_data.txt\' using 1:2 t \'{}\' w linespoints linewidth 2.5'.format(workdir,auto,auto))
+        f.write('\'{}/{}_data.txt\' using 1:2 t \'{}\' w linespoints linewidth 2.5'.format(workdir,auto,auto))
     f.write('\n')
     f.close()
 
     # run gnuplot script
     print('Generating chart ... ',end='')
-    if subprocess.call('gnuplot {}plotit.gp'.format(workdir),shell=True)==0:
+    if subprocess.call('gnuplot {}/plotit.gp'.format(workdir),shell=True)==0:
           print('OK')
     else:
           print('Error')

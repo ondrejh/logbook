@@ -169,6 +169,14 @@ if __name__ == '__main__':
             if copynow: #seek automated section (and copy)
                 f.write('{}\n'.format(line))
 
+                #seek chart
+                p = line.find('<!-- graf spotreby -->')
+                if p!=-1: #found chart section
+                    stepstr = line[:p]
+                    cnt = 1
+                    f.write('\n<img class="full" src="data/chart.png" alt="graf spotreby">\n')
+                    copynow=False
+
                 #seek table section
                 p = line.find('<!-- tabulka uctenky -->')
                 if p!=-1: #found table section
